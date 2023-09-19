@@ -1,5 +1,7 @@
 import Gallery from 'components/Gallery/Gallery';
+import { Container, Section } from 'components/Layout/Layout.styled';
 import { Loader } from 'components/Loader/Loader';
+import Message from 'components/Message/Message';
 import SearchForm from 'components/SearchForm/SearchForm';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -7,37 +9,38 @@ import { fetchMoviesSearched } from 'tmdbServices';
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchParams] = useSearchParams();
-  const title = searchParams.get('title') ?? '';
+  const [error, setError] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageToLoad = searchParams.get('page');
 
   useEffect(() => {
-    if (!searchQuery) {
+    if (!pageToLoad) {
+      setMovies([]);
       return;
     }
-
+    const title = searchParams.get('title') ?? '';
     const controller = new AbortController();
     const signal = controller.signal;
 
     getMovies();
 
     async function getMovies() {
+      setError('');
       setIsLoading(true);
+
       try {
-        const { results } = await fetchMoviesSearched(
-          searchQuery,
-          page,
-          signal
-        );
-        console.log(results);
+        const response = await fetchMoviesSearched(title, pageToLoad, signal);
+        const { results, total_results } = response;
         setMovies(results);
+
+        searchParams.set('total', total_results);
+        setSearchParams(searchParams);
       } catch (error) {
         if (error.code === 'ERR_CANCELED') {
           return;
         }
-        console.log(error);
+        setError(error.message);
       } finally {
         setIsLoading(false);
       }
@@ -46,23 +49,21 @@ const Movies = () => {
     return () => {
       controller.abort();
     };
-  }, [page, searchQuery]);
-
-  const handleSearch = query => {
-    if (searchQuery === title) {
-      return;
-    }
-    setPage(1);
-    setMovies([]);
-    setSearchQuery(query);
-  };
+  }, [pageToLoad, searchParams, setSearchParams]);
 
   return (
-    <>
-      <SearchForm onSubmit={handleSearch} />
+    <Container>
+      <Section>
+        <SearchForm />
+      </Section>
+      {error && <Message messageCode={'error'} errorCode={error} />}
       {isLoading && <Loader />}
-      {movies.length > 0 && <Gallery movies={movies} />}
-    </>
+      {movies.length > 0 ? (
+        <Gallery movies={movies} />
+      ) : (
+        <Message messageCode={'empty'} />
+      )}
+    </Container>
   );
 };
 

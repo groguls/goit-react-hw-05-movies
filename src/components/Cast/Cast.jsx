@@ -3,6 +3,9 @@ import { Loader } from 'components/Loader/Loader';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchMovieCredits } from 'tmdbServices';
+import { StyledCastList } from './Cast.styled';
+import { Container } from 'components/Layout/Layout.styled';
+import Message from 'components/Message/Message';
 
 const Cast = () => {
   const [casts, setCasts] = useState([]);
@@ -19,7 +22,6 @@ const Cast = () => {
       setIsLoading(true);
       try {
         const { cast } = await fetchMovieCredits(movieId, signal);
-        console.log(cast);
         setCasts(cast);
       } catch (error) {
         if (error.code === 'ERR_CANCELED') {
@@ -38,14 +40,18 @@ const Cast = () => {
 
   return (
     <>
-      {isLoading && <Loader />}
-      <div>
-        <ul>
-          {casts.map(cast => (
-            <CastCard key={cast.id} cast={cast} />
-          ))}
-        </ul>
-      </div>
+      <Container>
+        {isLoading && <Loader />}
+        {casts.length > 0 ? (
+          <StyledCastList>
+            {casts.map(cast => (
+              <CastCard key={cast.id} cast={cast} />
+            ))}
+          </StyledCastList>
+        ) : (
+          <Message messageCode={'cast'} />
+        )}
+      </Container>
     </>
   );
 };

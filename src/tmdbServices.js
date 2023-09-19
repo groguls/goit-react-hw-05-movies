@@ -10,10 +10,7 @@ export const fetchTrendingMovies = async signal => {
   const fetchOptions = {
     signal,
   };
-  const { data } = await axios.get(
-    '/3/trending/movie/day?language=en-US',
-    fetchOptions
-  );
+  const { data } = await axios.get('/3/trending/movie/day', fetchOptions);
   return data;
 };
 
@@ -53,7 +50,7 @@ export const fetchMovieCredits = async (movieId, signal) => {
   return data;
 };
 
-export const fetchMovieReviews = async (movieId, signal, page = 1) => {
+export const fetchMovieReviews = async (movieId, signal, page) => {
   const fetchOptions = {
     signal,
     params: {
@@ -64,18 +61,3 @@ export const fetchMovieReviews = async (movieId, signal, page = 1) => {
   const { data } = await axios.get(`/3/movie/${movieId}/reviews`, fetchOptions);
   return data;
 };
-
-// Trending: 'https://api.themoviedb.org/3/trending/movie/{time_window}'
-// 'https://api.themoviedb.org/3/trending/movie/day?language=en-US'
-
-// Movie : 'https://api.themoviedb.org/3/search/movie'
-// '/3/search/movie?query=lion%20king&include_adult=false&language=en-US&page=1'
-
-// Details: 'https://api.themoviedb.org/3/movie/{movie_id}'
-// '/3/movie/8587?language=en-US'
-
-// Credits: 'https://api.themoviedb.org/3/movie/{movie_id}/credits'
-// 'https://api.themoviedb.org/3/movie/8587/credits?language=en-US'
-
-// Reviews: 'https://api.themoviedb.org/3/movie/{movie_id}/reviews'
-// 'https://api.themoviedb.org/3/movie/8587/reviews?language=en-US&page=1'

@@ -1,27 +1,49 @@
 import { useSearchParams } from 'react-router-dom';
+import {
+  FormContainer,
+  Input,
+  SearchButton,
+  StyledForm,
+} from './SearchForm.styled';
+import { useState } from 'react';
+import Message from 'components/Message/Message';
 
-const SearchForm = ({ onSubmit }) => {
+const SearchForm = () => {
+  const [isEmpty, setIsEmpty] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const title = searchParams.get('title') ?? '';
 
   const handleInput = evt => {
-    setSearchParams(evt.target.value ? { title: evt.target.value } : {});
+    searchParams.set('title', evt.target.value);
+    setSearchParams(evt.target.value ? searchParams : {});
   };
 
   const handleSearchSubmit = evt => {
     evt.preventDefault();
     if (!title) {
-      console.log('Empty string!!!');
+      setIsEmpty(true);
       return;
     }
-    onSubmit(title);
+    searchParams.set('page', 1);
+    setSearchParams(searchParams);
+    setIsEmpty(false);
   };
 
   return (
-    <form onSubmit={handleSearchSubmit}>
-      <input onChange={handleInput} type="text" value={title} />
-      <button type="submit">Search</button>
-    </form>
+    <div>
+      <FormContainer>
+        <StyledForm onSubmit={handleSearchSubmit}>
+          <Input
+            onChange={handleInput}
+            type="search"
+            placeholder="Search for a movie"
+            value={title}
+          />
+          <SearchButton type="submit">Search</SearchButton>
+        </StyledForm>
+      </FormContainer>
+      {isEmpty && <Message messageCode={'empty'} />}
+    </div>
   );
 };
 

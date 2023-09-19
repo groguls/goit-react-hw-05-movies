@@ -5,9 +5,9 @@ export const Loader = () => {
     <Bars
       height="80"
       width="80"
-      color="#4fa94d"
+      color="#01b4e4"
       ariaLabel="bars-loading"
-      wrapperStyle={{}}
+      wrapperStyle={{ justifyContent: 'center' }}
       wrapperClass=""
       visible={true}
     />

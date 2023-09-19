@@ -1,17 +1,45 @@
+import {
+  Avatar,
+  InfoCaption,
+  InfoDiv,
+  InfoTitle,
+  Span,
+  StyledReviewCard,
+} from './ReviewCard.styled';
+
 const ReviewCard = ({ review }) => {
+  const {
+    author_details: { avatar_path, name },
+    author,
+    created_at,
+    content,
+  } = review;
+
+  const date = new Date(created_at).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
     <>
-      <li>
-        <img
-          src={`https://image.tmdb.org/t/p/w45${review.author_details.avatar_path}`}
-          alt={`${review.author_details.name} profile`}
-        ></img>
-        <h3>A review by {review.author}</h3>
-        <h5>
-          Written by {review.author} on {review.created_at}
-        </h5>
-        <p>{review.content}</p>
-      </li>
+      <StyledReviewCard>
+        <article>
+          <InfoDiv>
+            <Avatar
+              src={`https://image.tmdb.org/t/p/w45${avatar_path}`}
+              alt={`${name} profile`}
+            ></Avatar>
+            <div>
+              <InfoTitle>A review by {author}</InfoTitle>
+              <InfoCaption>
+                Written by <Span>{author}</Span> on {date}
+              </InfoCaption>
+            </div>
+          </InfoDiv>
+          <p>{content}</p>
+        </article>
+      </StyledReviewCard>
     </>
   );
 };
