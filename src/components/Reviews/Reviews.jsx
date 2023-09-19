@@ -4,10 +4,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { fetchMovieReviews } from 'tmdbServices';
 import { StyledReviewList } from './Reviews.styled';
-import { Container } from 'components/Layout/Layout.styled';
 import Message from 'components/Message/Message';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { nanoid } from 'nanoid';
+import { Pagination } from 'react-pagination-bar';
 
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -37,7 +36,7 @@ const Reviews = () => {
         const response = await fetchMovieReviews(movieId, signal, page);
         const { results, total_results } = response;
 
-        setReviews(prevReviews => [...prevReviews, ...results]);
+        setReviews(results);
 
         searchParams.set('total_reviews', total_results);
         setSearchParams(searchParams);
@@ -63,28 +62,26 @@ const Reviews = () => {
 
   return (
     <>
-      <Container>
-        {error && <Message messageCode={'error'} errorCode={error} />}
-        {isLoading && <Loader />}
-        {reviews.length > 0 ? (
-          <InfiniteScroll
-            dataLength={reviews.length}
-            next={handleLoadMore}
-            hasMore={total > reviews.length}
-            loader={<Loader />}
-            endMessage={<Message messageCode={'end'} />}
-            style={{ paddingBottom: '64px' }}
-          >
-            <StyledReviewList>
-              {reviews.map(review => (
-                <ReviewCard key={nanoid()} review={review} />
-              ))}
-            </StyledReviewList>
-          </InfiniteScroll>
-        ) : (
-          <Message messageCode={'reviews'} />
-        )}
-      </Container>
+      {error && <Message messageCode={'error'} errorCode={error} />}
+      {isLoading && <Loader />}
+      {reviews.length > 0 ? (
+        <>
+          <StyledReviewList>
+            {reviews.map(review => (
+              <ReviewCard key={nanoid()} review={review} />
+            ))}
+          </StyledReviewList>
+          <Pagination
+            currentPage={page}
+            itemsPerPage={20}
+            onPageChange={handleLoadMore}
+            totalItems={total}
+            customClassNames={{}}
+          />
+        </>
+      ) : (
+        <Message messageCode={'reviews'} />
+      )}
     </>
   );
 };
